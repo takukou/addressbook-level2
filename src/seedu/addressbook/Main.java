@@ -9,6 +9,7 @@ import seedu.addressbook.parser.Parser;
 import seedu.addressbook.storage.StorageFile;
 import seedu.addressbook.ui.TextUi;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -82,10 +83,13 @@ public class Main {
         do {
             String userCommandText = ui.getUserCommand();
             command = new Parser().parseCommand(userCommandText);
-            CommandResult result = executeCommand(command);
-            recordResult(result);
-            ui.showResultToUser(result);
-
+            try {
+                CommandResult result = executeCommand(command);
+                recordResult(result);
+                ui.showResultToUser(result);
+            } catch (MissingStorageFileException e) {
+                ui.showToUser("Error: Storage file missing... Recreating file now...");
+            }
         } while (!ExitCommand.isExit(command));
     }
 
@@ -103,7 +107,10 @@ public class Main {
      * @param command user command
      * @return result of the command
      */
-    private CommandResult executeCommand(Command command)  {
+    private CommandResult executeCommand(Command command) throws MissingStorageFileException {
+        if(!storageFileExists()){
+            throw new MissingStorageFileException("Error: Missing storage file");
+        }
         try {
             command.setData(addressBook, lastShownList);
             CommandResult result = command.execute();
@@ -113,6 +120,10 @@ public class Main {
             ui.showToUser(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean storageFileExists() {
+        return new File(storage.getPath()).exists();
     }
 
     /**

@@ -32,6 +32,12 @@ public class StorageFile {
             super(message);
         }
     }
+    
+    public static class MissingStorageFileException extends Exception {
+        public MissingStorageFileException(String message) {
+            super(message);
+        }
+    }
 
     /**
      * Signals that some error has occured while trying to convert and read/write data between the application
@@ -53,7 +59,7 @@ public class StorageFile {
     public StorageFile() throws InvalidStorageFilePathException {
         this(DEFAULT_STORAGE_FILEPATH);
     }
-
+    
     /**
      * @throws InvalidStorageFilePathException if the given file path is invalid
      */
